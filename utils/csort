@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Fast calculation if count of each line
+
+perl -ne '
+    $count{$_}++;
+    END {
+        print "$count{$_}	$_" for sort {
+            $count{$b} <=> $count{$a} || $b cmp $a
+        } keys %count
+    }
+' $1 

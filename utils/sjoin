@@ -1,0 +1,76 @@
+#!/bin/bash
+
+# Usage info
+show_help() {
+cat << EOF
+Usage: ${0##*/} [OPTION]... FILE1 FILE2
+This script sort and join 2 files.
+
+    -a FILENUM        also print unpairable lines from file FILENUM, where
+                      FILENUM is 1 or 2, corresponding to FILE1 or FILE2
+    -e EMPTY          replace missing input fields with EMPTY
+    -i                ignore differences in case when comparing fields
+    -j FIELD          equivalent to '-1 FIELD -2 FIELD'
+    -o FORMAT         obey FORMAT while constructing output line
+    -t CHAR           use CHAR as input and output field separator
+    -v FILENUM        like -a FILENUM, but suppress joined output lines
+    -1 FIELD          join on this FIELD of file 1
+    -2 FIELD          join on this FIELD of file 2
+    -z                end lines with 0 byte, not newline
+    -h                display this help and exit
+
+EOF
+}
+
+# Initialize our own variables:
+a_option=""
+e_option=""
+i_option=""
+j_option=""
+o_option=""
+t_option="-t' '"
+v_option=""
+z_option=""
+option_1="1"
+option_2="1"
+
+OPTIND=1 # Reset is necessary if getopts was used previously in the script.  It is a good idea to make this local in a function.
+while getopts "a:e:ij:o:t:v:1:2:c:hz" opt; do
+    case "$opt" in
+        a)  a_option="-a$OPTARG"
+            ;;
+        e)  e_option="-e"
+            ;;
+        i)  i_option="-i"
+            ;;
+        j)  option_1=$OPTARG
+            option_2=$OPTARG
+            ;;
+        o)  o_option="-o'$OPTARG'"
+            ;;
+        t)  t_option="-t'$OPTARG'"
+            ;;
+        v)  v_option="-v'$OPTARG'"
+            ;;
+        1)  option_1=$OPTARG
+            ;;
+        2)  option_2=$OPTARG
+            ;;
+        z)  z_option="-z"
+            ;;
+        h)
+            show_help
+            exit 0
+            ;;
+        '?')
+            show_help >&2
+            exit 1
+            ;;
+    esac
+done
+options="${a_option} ${e_option} ${i_option} ${o_option} ${t_option} ${v_option} ${z_option}"
+
+# TODO: validations
+shift "$((OPTIND-1))" # Shift off the options and optional --.
+
+eval "LANG=en_EN join -1 $option_1 -2 $option_2 $options <(LANG=en_EN sort $t_option -k$option_1,$option_1 $1) <(LANG=en_EN sort $t_option -k$option_2,$option_2 $2)"
