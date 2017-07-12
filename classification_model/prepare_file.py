@@ -1,14 +1,9 @@
-# coding: utf-8
-from __future__ import print_function
-import gzip
 import re
 import sys
-from bs4 import BeautifulSoup
+import gzip
 
 
 PROGRESS_STEP = 500
-MIN_NGRAM = 1
-MAX_NGRAM = 3
 
 STOPWORDS = [
     "i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your", "yours", "yourself",
@@ -66,46 +61,38 @@ def get_previous_words(target_word, text):
     ]
     return [words[word_index] for word_index in words_index]
 
-
-def clean_text(text):
-    try:
-        soup = BeautifulSoup("<br/>" + text, "html.parser")
-        second_clean = soup.get_text().replace("\t", " ").replace("\n", " ").replace(
-            "\"", "").replace("'", "").replace("\r", "")
-        return (" ".join([
-            word for word in re.findall(r"(?u)\b\w\w+\b", second_clean)
-            if not re.match(r"[0-9]+$", word.strip())
-        ][0:200]))
-    except:
-        return None
+def progress(index):
+    if index % PROGRESS_STEP == 0:
+        print(index, file=sys.stderr)
 
 
-def main():
-    filepath = sys.argv[1]
+def process_file(features_filepath, data_filepath, output_filepath):
+    features = [feature.rstrip("\r\n") for feature in open(features_filepath, 'rt', encoding='utf-8').readlines()]
     index = 0
-    if filepath.find(".gz") > 0:
-        file_ = gzip.open(filepath, 'rt', encoding='utf-8')
-    else:
-        file_ = open(filepath)
-    for line in file_:
-        if index % PROGRESS_STEP == 0:
-            print(index, file=sys.stderr)
-        try:
-            token, tag, title, raw_paragraphs = line.rstrip("\r\n").split("\t")
-            title = clean_text(title)
-            paragraphs = clean_text(raw_paragraphs)
-            new_row = [
-                tag + "\t" + ngram
-                for ngram in get_ngrams(title, paragraphs, MIN_NGRAM, MAX_NGRAM)
-            ]
-            print("\n".join(new_row))
-        except BrokenPipeError as exception:
-            raise exception
-        except:
-            print("Error: %s" % line, file=sys.stderr)
-        index += 1
-    file_.close()
-
+    with gzip.open(output_filepath, "wt", encoding="utf-8") as file_:
+        file_.write("id,%s,puduml___result\n" % ",".join(features))
+        if data_filepath.find(".gz") > 0:
+            data_file = gzip.open(data_filepath, 'rt', encoding='utf-8')
+        else:
+            data_file = open(data_filepath, 'rt', encoding='utf-8')
+        for line in data_file:
+            try:
+                doc_id, result, title, text = line.rstrip("\r\n").split("\t")
+            except:
+                continue
+            found_features = []
+            row_features = get_ngrams(title, text, 1, 3)
+            for feature in features:
+                value = "0"
+                if feature in row_features:
+                    value = "1"
+                found_features.append(value)
+            file_.write("%s,%s,%s\n" % (doc_id, ",".join(found_features), result))
+            progress(index)
+            index += 1
 
 if __name__ == '__main__':
-    main()
+    data_filepath = sys.argv[1]
+    features_filepath = sys.argv[2]
+    output_filepath = sys.argv[3]
+    process_file(features_filepath, data_filepath, output_filepath)
