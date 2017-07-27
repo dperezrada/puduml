@@ -9,6 +9,7 @@ A group of tools to make text analytics and machine learning.
 ## Install
 
  * pip install -r requirements.txt
+ * cd utils/python;python setup.py develop
 
 ## Components
 
