@@ -5,24 +5,12 @@ import re
 import sys
 from bs4 import BeautifulSoup
 
+from puduml_utils import EN_STOPWORDS, print_progress_bar, count_lines_from_file
+
 
 PROGRESS_STEP = 500
 MIN_NGRAM = 1
 MAX_NGRAM = 3
-
-STOPWORDS = [
-    "i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your", "yours", "yourself",
-    "yourselves", "he", "him", "his", "himself", "she", "her", "hers", "herself", "it", "its",
-    "itself", "they", "them", "their", "theirs", "themselves", "what", "which", "who", "whom",
-    "this", "that", "these", "those", "am", "is", "are", "was", "were", "be", "been", "being",
-    "have", "has", "had", "having", "do", "does", "did", "doing", "a", "an", "the", "and", "but",
-    "if", "or", "because", "as", "until", "while", "of", "at", "by", "for", "with", "about",
-    "against", "between", "into", "through", "during", "before", "after", "above", "below", "to",
-    "from", "up", "down", "in", "out", "on", "off", "over", "under", "again", "further", "then",
-    "once", "here", "there", "when", "where", "why", "how", "all", "any", "both", "each", "few",
-    "more", "most", "other", "some", "such", "no", "nor", "not", "only", "own", "same", "so",
-    "than", "too", "very", "s", "t", "can", "will", "just", "don", "should", "now"
-]
 
 
 def is_number(possible_number):
@@ -37,7 +25,7 @@ def get_words_from_text(text):
     return [
         word
         for word in re.sub(r"[^\w\-']", " ", text.lower().strip()).split(" ")
-        if word.strip() and word not in STOPWORDS and not is_number(word)
+        if word.strip() and word not in EN_STOPWORDS and not is_number(word)
     ]
 
 
@@ -87,9 +75,9 @@ def main():
         file_ = gzip.open(filepath, 'rt', encoding='utf-8')
     else:
         file_ = open(filepath)
+    total_lines = count_lines_from_file(filepath)
     for line in file_:
-        if index % PROGRESS_STEP == 0:
-            print(index, file=sys.stderr)
+        print_progress_bar(index, total_lines, prefix='Progress:', suffix='Complete', length=50)
         try:
             token, tag, title, raw_paragraphs = line.rstrip("\r\n").split("\t")
             title = clean_text(title)

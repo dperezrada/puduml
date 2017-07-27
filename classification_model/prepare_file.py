@@ -2,22 +2,9 @@ import re
 import sys
 import gzip
 
+from puduml_utils import print_progress_bar, EN_STOPWORDS
 
 PROGRESS_STEP = 500
-
-STOPWORDS = [
-    "i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your", "yours", "yourself",
-    "yourselves", "he", "him", "his", "himself", "she", "her", "hers", "herself", "it", "its",
-    "itself", "they", "them", "their", "theirs", "themselves", "what", "which", "who", "whom",
-    "this", "that", "these", "those", "am", "is", "are", "was", "were", "be", "been", "being",
-    "have", "has", "had", "having", "do", "does", "did", "doing", "a", "an", "the", "and", "but",
-    "if", "or", "because", "as", "until", "while", "of", "at", "by", "for", "with", "about",
-    "against", "between", "into", "through", "during", "before", "after", "above", "below", "to",
-    "from", "up", "down", "in", "out", "on", "off", "over", "under", "again", "further", "then",
-    "once", "here", "there", "when", "where", "why", "how", "all", "any", "both", "each", "few",
-    "more", "most", "other", "some", "such", "no", "nor", "not", "only", "own", "same", "so",
-    "than", "too", "very", "s", "t", "can", "will", "just", "don", "should", "now"
-]
 
 
 def is_number(possible_number):
@@ -32,7 +19,7 @@ def get_words_from_text(text):
     return [
         word
         for word in re.sub(r"[^\w\-']", " ", text.lower().strip()).split(" ")
-        if word.strip() and word not in STOPWORDS and not is_number(word)
+        if word.strip() and word not in EN_STOPWORDS and not is_number(word)
     ]
 
 
@@ -61,21 +48,20 @@ def get_previous_words(target_word, text):
     ]
     return [words[word_index] for word_index in words_index]
 
-def progress(index):
-    if index % PROGRESS_STEP == 0:
-        print(index, file=sys.stderr)
-
 
 def process_file(features_filepath, data_filepath, output_filepath):
     features = [feature.rstrip("\r\n") for feature in open(features_filepath, 'rt', encoding='utf-8').readlines()]
     index = 0
+    total_lines = 0
     with gzip.open(output_filepath, "wt", encoding="utf-8") as file_:
         file_.write("id,%s,puduml___result\n" % ",".join(features))
         if data_filepath.find(".gz") > 0:
+            total_lines = sum(1 for line in gzip.open(data_filepath, 'rt', encoding='utf-8'))
             data_file = gzip.open(data_filepath, 'rt', encoding='utf-8')
         else:
+            total_lines = sum(1 for line in open(data_filepath, 'rt', encoding='utf-8'))
             data_file = open(data_filepath, 'rt', encoding='utf-8')
-        for line in data_file:
+        for line_number, line in enumerate(data_file):
             try:
                 doc_id, result, title, text = line.rstrip("\r\n").split("\t")
             except:
@@ -88,8 +74,7 @@ def process_file(features_filepath, data_filepath, output_filepath):
                     value = "1"
                 found_features.append(value)
             file_.write("%s,%s,%s\n" % (doc_id, ",".join(found_features), result))
-            progress(index)
-            index += 1
+            print_progress_bar(line_number, total_lines, prefix='Progress:', suffix='Complete', length=50)
 
 if __name__ == '__main__':
     data_filepath = sys.argv[1]

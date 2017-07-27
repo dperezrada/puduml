@@ -47,13 +47,7 @@ results = {}
 for index, predition_row in enumerate(predictions_with_prob):
     real_result = test['puduml___result'][index]
     total[real_result] = total.get(real_result, 0) + 1
-    # if real_result == "yes" and predition_row[1] <= 0.3:
-    #     results_file.write("%s\tnot_included" % test.index[index])
-    # elif real_result == "yes":
-    #     results_file.write("%s\tincluded" % test.index[index])
     result_index = list(target_names).index(real_result)
-    # if real_result == "systematic_review" and predition_row[1] >= 0.5:
-    #     results_file.write("missed_sr")
     if not results.get(real_result):
         results[real_result] = {}
     result_value = round(predition_row[result_index], 1)
