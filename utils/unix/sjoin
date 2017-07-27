@@ -73,4 +73,4 @@ options="${a_option} ${e_option} ${i_option} ${o_option} ${t_option} ${v_option}
 # TODO: validations
 shift "$((OPTIND-1))" # Shift off the options and optional --.
 
-echo "LANG=en_EN join -1 $option_1 -2 $option_2 $options <(LANG=en_EN sort $t_option -k$option_1,$option_1 $1) <(LANG=en_EN sort $t_option -k$option_2,$option_2 $2)"
+eval "LANG=en_EN join -1 $option_1 -2 $option_2 $options <(LANG=en_EN sort $t_option -k$option_1,$option_1 $1) <(LANG=en_EN sort $t_option -k$option_2,$option_2 $2)"
