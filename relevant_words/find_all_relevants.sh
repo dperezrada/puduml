@@ -1,5 +1,7 @@
 #!/bin/bash
 
+PYTHON_PATH="${PYTHON_PATH:-python}"
+
 INPUT_FILE=$1
 OUTPUT_PATH=$2
 FILTER_TOP_X=2000
@@ -9,7 +11,7 @@ N_PROCESS=3
 mkdir -p ${OUTPUT_PATH}/base
 # Generate all possible phrases associated with the category
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-python ${SCRIPT_DIR}/get_phrases_by_category.py $INPUT_FILE > ${OUTPUT_PATH}/base/all_words_with_category.tsv
+$PYTHON_PATH ${SCRIPT_DIR}/get_phrases_by_category.py $INPUT_FILE > ${OUTPUT_PATH}/base/all_words_with_category.tsv
 
 
 # Calculate 
