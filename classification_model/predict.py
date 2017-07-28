@@ -8,7 +8,7 @@ model_path = sys.argv[2]
 
 #Read CSV file (DISCOURAGED, please use pandas.read_csv() instead).
 #df = pd.DataFrame.from_csv(data_path, compression='gzip', header=0, sep=',', index_col=0)
-df = pd.read_csv(data_path, header=0, sep=',', index_col=0, compression='gzip')
+df = pd.read_csv(data_path, header=0, sep=',', index_col=0)
 
 features = df.columns[:len(df.columns) - 1]
 clf = joblib.load(model_path)
