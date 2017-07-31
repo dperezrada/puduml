@@ -1,5 +1,6 @@
 import sys
 from sklearn.ensemble import RandomForestClassifier
+from sklearn import svm
 import pandas as pd
 import numpy as np
 from sklearn.externals import joblib
@@ -30,6 +31,7 @@ test = df[df['is_train'] == False]
 
 features = df.columns[:len(df.columns) - 2]
 clf = RandomForestClassifier(n_estimators=N_ESTIMATORS, n_jobs=N_PROCESS)
+# clf = svm.LinearSVC(probability=True)
 y, target_names = pd.factorize(train['puduml___result'], sort=True)
 clf.fit(train[features], y)
 

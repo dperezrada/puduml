@@ -55,13 +55,17 @@ def get_previous_words(target_word, text):
     return [words[word_index] for word_index in words_index]
 
 
-def clean_text(text):
+def clean_text(text, parseHTML=False):
     try:
-        soup = BeautifulSoup("<br/>" + text, "html.parser")
-        second_clean = soup.get_text().replace("\t", " ").replace("\n", " ").replace(
+        if parseHTML:
+            soup = BeautifulSoup("<br/>" + text, "html.parser")
+            parsed_text = soup.get_text()
+        else:
+            parsed_text = text
+        second_clean = parsed_text.replace("\t", " ").replace("\n", " ").replace(
             "\"", "").replace("'", "").replace("\r", "")
         return (" ".join([
-            word for word in re.findall(r"(?u)\b\w\w+\b", second_clean)
+            word for word in re.findall(r"(?u)\b\w[\w-]+\b", second_clean)
             if not re.match(r"[0-9]+$", word.strip())
         ][0:200]))
     except:
