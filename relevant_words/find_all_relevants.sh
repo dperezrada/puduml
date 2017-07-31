@@ -6,10 +6,10 @@ ONE_CLASSIFICATION=$3
 SELECT_TOP_Y=$4
 N_PROCESS=$5
 
-if [[ ! -z "$SELECT_TOP_Y" ]]; then
+if [[ -z "$SELECT_TOP_Y" ]]; then
 	SELECT_TOP_Y=500
 fi
-if [[ ! -z "$N_PROCESS" ]]; then
+if [[ -z "$N_PROCESS" ]]; then
 	N_PROCESS=3
 fi
 FILTER_TOP_X=$(( ${SELECT_TOP_Y} * 4 ))

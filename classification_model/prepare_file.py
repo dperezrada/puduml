@@ -88,7 +88,7 @@ def process_file_base(features_filepath, data_filepath, total_lines, output_file
                 print_progress_bar(line_number, total_lines, prefix='Progress:', suffix='Complete', length=50)
             else:
                 if line_number % PROGRESS_STEP == 0:
-                    print("batch %s ok" % line_number)
+                    print("batch %s ok" % line_number, file=sys.stderr)
 
 def process_file(features_filepath, data_filepath, output_filepath):
     if data_filepath.find(".gz") > 0:

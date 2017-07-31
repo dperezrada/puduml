@@ -6,7 +6,7 @@ FEATURES_PATH=$3
 PREPARED_FILE=$4
 N_PROCESS=$5
 
-if [[ ! -z "$N_PROCESS" ]]; then
+if [[ -z "$N_PROCESS" ]]; then
 	N_PROCESS=2
 fi
 
