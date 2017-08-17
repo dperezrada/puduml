@@ -5,9 +5,13 @@ OUTPUT_PATH=$2
 ONE_CLASSIFICATION=$3
 SELECT_TOP_Y=$4
 N_PROCESS=$5
+MIN_APPEAR="$6"
 
 if [[ -z "$SELECT_TOP_Y" ]]; then
 	SELECT_TOP_Y=500
+fi
+if [[ -z "$MIN_APPEAR" ]]; then
+	MIN_APPEAR="5"
 fi
 if [[ -z "$N_PROCESS" ]]; then
 	N_PROCESS=3
@@ -48,12 +52,13 @@ for classification in $CLASSIFICATIONS; do
 		}
 
 	${SCRIPT_DIR}/../utils/unix/sjoin -t$'\t' -1 2 -2 2 -a1 -o '1.2,1.1,2.1' ${OUTPUT_PATH}/classifications/${classification}_positive.tsv ${OUTPUT_PATH}/base/all_words_with_count.tsv |
-		awk -F$'\t' 'BEGIN{OFS=FS}{print $1,$2,$3,($2/$3)}' |			# calculate total in group/total documents
-		LANG=en_EN sort -t$'\t' -k2,2nr |											# sort by group frequency
-		head -n ${FILTER_TOP_X} |										# get only the first X more frequent phrases
-		LANG=en_EN sort -t$'\t' -k4,4nr |											# sort by division over total
-		head -n${SELECT_TOP_Y} |										# select top Y
-		LANG=en_EN sort -t$'\t' -k2,2nr > ${OUTPUT_PATH}/classifications/${classification}_positive_with_all.tsv
+	awk -F$'\t' 'BEGIN{OFS=FS}{print $1,$2,$3,($2/$3)}' |			# calculate total in group/total documents
+	awk -F$'\t' -v MIN_APPEAR="${MIN_APPEAR}" '{if($2>=MIN_APPEAR)print $0}' |
+	LANG=en_EN sort -t$'\t' -k2,2nr |											# sort by group frequency
+	head -n ${FILTER_TOP_X} |										# get only the first X more frequent phrases
+	LANG=en_EN sort -t$'\t' -k4,4nr |											# sort by division over total
+	head -n${SELECT_TOP_Y} |										# select top Y
+	LANG=en_EN sort -t$'\t' -k2,2nr > ${OUTPUT_PATH}/classifications/${classification}_positive_with_all.tsv
 
 	rm ${OUTPUT_PATH}/classifications/${classification}_positive.tsv
 	mv ${OUTPUT_PATH}/classifications/${classification}_positive_with_all.tsv ${OUTPUT_PATH}/classifications/${classification}_positive.tsv
