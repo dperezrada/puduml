@@ -34,11 +34,11 @@ fi
 if [ ! -f "${BASE_PATH}/all_words_with_count.tsv" ]; then
 	echo "Count all words"
 	# Calculate 
-	cut -d$'\t' -f1,3 ${OUTPUT_PATH}/base/all_words_with_category.tsv | \
+	cut -d$'\t' -f1,3 ${OUTPUT_PATH}/base/all_words_with_category.tsv | 
 		awk '!seen[$0]++' |
 		cut -d$'\t' -f2 |
-		${SCRIPT_DIR}/../utils/unix/csort | \
-		awk -F$'\t' 'BEGIN{OFS="\t"}{print 1,$2}'> ${OUTPUT_PATH}/base/all_words_with_count.tsv
+		${SCRIPT_DIR}/../utils/unix/csort | 
+		awk -F$'\t' 'BEGIN{OFS=FS}{print $1,$2}'> ${OUTPUT_PATH}/base/all_words_with_count.tsv
 fi
 
 mkdir -p ${OUTPUT_PATH}/classifications/
