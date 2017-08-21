@@ -52,7 +52,7 @@ for index, predition_row in enumerate(predictions_with_prob):
     result_index = list(target_names).index(real_result)
     if not results.get(real_result):
         results[real_result] = {}
-    result_value = round(predition_row[result_index], 1)
+    result_value = round(predition_row[result_index], 2)
     if not results[real_result].get(result_value):
         results[real_result][result_value] = 0
     results[real_result][result_value] += 1
