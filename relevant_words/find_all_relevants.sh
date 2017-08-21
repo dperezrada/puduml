@@ -7,6 +7,8 @@ SELECT_TOP_Y=$4
 N_PROCESS=$5
 MIN_APPEAR="$6"
 
+LOCAL_PYTHON_BIN="${LOCAL_PYTHON_BIN:-python}"
+
 
 if [[ -z "$SELECT_TOP_Y" ]]; then
 	SELECT_TOP_Y=500
@@ -26,7 +28,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 if [ ! -f "${BASE_PATH}/all_words_with_category.tsv" ]; then
 	echo "Find phrases by category"
-	python ${SCRIPT_DIR}/get_phrases_by_category.py $INPUT_FILE > ${BASE_PATH}/all_words_with_category.tsv
+	${LOCAL_PYTHON_BIN} ${SCRIPT_DIR}/get_phrases_by_category.py $INPUT_FILE > ${BASE_PATH}/all_words_with_category.tsv
 fi
 
 if [ ! -f "${BASE_PATH}/all_words_with_count.tsv" ]; then
