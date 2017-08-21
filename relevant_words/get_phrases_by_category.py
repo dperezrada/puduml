@@ -8,9 +8,7 @@ from bs4 import BeautifulSoup
 from puduml_utils import EN_STOPWORDS, print_progress_bar, count_lines_from_file
 
 
-PROGRESS_STEP = 500
-MIN_NGRAM = 1
-MAX_NGRAM = 3
+PROGRESS_STEP = 1000
 
 
 def is_number(possible_number):
@@ -74,28 +72,39 @@ def clean_text(text, parseHTML=False):
 
 def main():
     filepath = sys.argv[1]
+    if len(sys.argv) > 2:
+        min_ngram = sys.argv[2]
+    else:
+        min_ngram = 1
+    if len(sys.argv) > 3:
+        max_ngram = sys.argv[3]
+    else:
+        max_ngram = 3
     index = 0
     if filepath.find(".gz") > 0:
         file_ = gzip.open(filepath, 'rt', encoding='utf-8')
     else:
         file_ = open(filepath)
     total_lines = count_lines_from_file(filepath)
+    total_errors = 0
     for line in file_:
         print_progress_bar(index, total_lines, prefix='Progress:', suffix='Complete', length=50)
         try:
             token, tag, title, raw_paragraphs = line.rstrip("\r\n").split("\t")
             title = clean_text(title)
-            paragraphs = clean_text(raw_paragraphs)
+            paragraphs = clean_text(raw_paragraphs, True)
             new_row = [
-                tag + "\t" + ngram
-                for ngram in get_ngrams(title, paragraphs, MIN_NGRAM, MAX_NGRAM)
+                token + "\t" + tag + "\t" + ngram
+                for ngram in get_ngrams(title, paragraphs, min_ngram, max_ngram)
             ]
             print("\n".join(new_row))
         except BrokenPipeError as exception:
             raise exception
         except:
-            print("Error: %s" % line, file=sys.stderr)
+            total_errors += 1
         index += 1
+    print("%s lines were omited" % total_errors, file=sys.stderr)
+
     file_.close()
 
 

@@ -47,7 +47,7 @@ predictions_with_prob = clf.predict_proba(test[features])
 total = {}
 results = {}
 for index, predition_row in enumerate(predictions_with_prob):
-    real_result = test['puduml___result'][index]
+    real_result = test['puduml___result'].iloc[index]
     total[real_result] = total.get(real_result, 0) + 1
     result_index = list(target_names).index(real_result)
     if not results.get(real_result):

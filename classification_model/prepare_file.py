@@ -57,6 +57,7 @@ def process_file_base(features_filepath, data_filepath, total_lines, output_file
         start = 0
     if end is None:
         end = total_lines
+    lines_with_errors = 0
     features = [feature.rstrip("\r\n") for feature in open(features_filepath, 'rt', encoding='utf-8').readlines()]
     with gzip.open(output_filepath, "wt", encoding="utf-8") as file_:
         if data_filepath.find(".gz") > 0:
@@ -73,8 +74,7 @@ def process_file_base(features_filepath, data_filepath, total_lines, output_file
                 title = splitted_row[2]
                 text = " ".join(splitted_row[3:])
             except:
-                import ipdb;ipdb.set_trace()
-                print("ERROR line number: %s" % line_number, file=sys.stderr)
+                lines_with_errors += 1
                 continue
             found_features = []
             row_features = get_ngrams(title, text, 1, 3)
@@ -89,6 +89,9 @@ def process_file_base(features_filepath, data_filepath, total_lines, output_file
             else:
                 if line_number % PROGRESS_STEP == 0:
                     print("batch %s ok" % line_number, file=sys.stderr)
+        if lines_with_errors > 0:
+            print("%s lines ommited" % line_number, file=sys.stderr)
+
 
 def process_file(features_filepath, data_filepath, output_filepath):
     if data_filepath.find(".gz") > 0:
