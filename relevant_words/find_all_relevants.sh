@@ -7,11 +7,12 @@ SELECT_TOP_Y=$4
 N_PROCESS=$5
 MIN_APPEAR="$6"
 
+
 if [[ -z "$SELECT_TOP_Y" ]]; then
 	SELECT_TOP_Y=500
 fi
 if [[ -z "$MIN_APPEAR" ]]; then
-	MIN_APPEAR="5"
+	MIN_APPEAR="2"
 fi
 if [[ -z "$N_PROCESS" ]]; then
 	N_PROCESS=3
