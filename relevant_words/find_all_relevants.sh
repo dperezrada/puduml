@@ -101,18 +101,4 @@ for classification in $CLASSIFICATIONS; do
 	awk -F$'\t' 'BEGIN{OFS=FS}{print $1,$2,$3}' > ${OUTPUT_PATH}/classifications/${classification}.tsv
 	rm ${OUTPUT_PATH}/classifications/${classification}_final_*.tsv
 	rm ${OUTPUT_PATH}/classifications/${classification}_numeric*.tsv
-
-
-	# cat ${OUTPUT_PATH}/base/all_words_with_category.tsv| grep -v "^${classification}	" | cut -d$'\t' -f2 | \
-	# 	awk 'BEGIN{OFS="\t"}{seen[$0]++}END{for(key in seen){print seen[key],key}}' | \
-	# 	LANG=en_EN sort -t$'\t' -k1,1nr | \
-	# 	awk -F$'\t' 'BEGIN{OFS="\t"}{print $1,$2}' > ${OUTPUT_PATH}/classifications/${classification}_negative.tsv
-	# ${SCRIPT_DIR}/../utils/unix/sjoin -t$'\t' -1 2 -2 2 -a1 -o '1.2,1.1,2.1' \
-	# 	${OUTPUT_PATH}/classifications/${classification}_negative.tsv ${OUTPUT_PATH}/base/all_words_with_count.tsv | \
-	# 	awk -F$'\t' 'BEGIN{OFS=FS}{print $1,$2,$3,($2/$3)}' | \
-	# 	LANG=en_EN sort -t$'\t' -k2,2nr | head -n ${FILTER_TOP_X} | LANG=en_EN sort -t$'\t' -k4,4nr | head -n${SELECT_TOP_Y} | \
-	# 	LANG=en_EN sort -t$'\t' -k2,2nr> ${OUTPUT_PATH}/classifications/${classification}_negative_with_all.tsv
-
-	# rm ${OUTPUT_PATH}/classifications/${classification}_negative.tsv
-	# mv ${OUTPUT_PATH}/classifications/${classification}_negative_with_all.tsv ${OUTPUT_PATH}/classifications/${classification}_negative.tsv
 done
