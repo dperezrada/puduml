@@ -60,21 +60,21 @@ for classification in $CLASSIFICATIONS; do
 
 	cat ${OUTPUT_PATH}/base/all_words_with_category.tsv	|
 		grep "	${classification}	" |
-		grep -v " " |
+		# grep -v " " |
 		cut -d$'\t' -f3 |																# Extract only phrase
 		{
 			# Count number of phrases
 			${SCRIPT_DIR}/../utils/unix/csort > ${OUTPUT_PATH}/classifications/${classification}_numeric_1.tsv
 		}
 
-	cat ${OUTPUT_PATH}/base/all_words_with_category.tsv	|
-		grep "	${classification}	" |
-		grep " " |
-		cut -d$'\t' -f3 |																# Extract only phrase
-		{
-			# Count number of phrases
-			${SCRIPT_DIR}/../utils/unix/csort > ${OUTPUT_PATH}/classifications/${classification}_numeric_2.tsv
-		}
+	# cat ${OUTPUT_PATH}/base/all_words_with_category.tsv	|
+	# 	grep "	${classification}	" |
+	# 	grep " " |
+	# 	cut -d$'\t' -f3 |																# Extract only phrase
+	# 	{
+	# 		# Count number of phrases
+	# 		${SCRIPT_DIR}/../utils/unix/csort > ${OUTPUT_PATH}/classifications/${classification}_numeric_2.tsv
+	# 	}
 
 	# TODO: Refactor this
 	${SCRIPT_DIR}/../utils/unix/sjoin -t$'\t' -1 2 -2 2 -a1 -o '1.2,1.1,2.1' ${OUTPUT_PATH}/classifications/${classification}_numeric_1.tsv ${OUTPUT_PATH}/base/all_words_with_count.tsv |
@@ -88,16 +88,16 @@ for classification in $CLASSIFICATIONS; do
 	LANG=en_EN sort -t$'\t' -k7,7n |										# select top Y
 	head -n${SELECT_TOP_Y} > ${OUTPUT_PATH}/classifications/${classification}_final_1.tsv
 
-	${SCRIPT_DIR}/../utils/unix/sjoin -t$'\t' -1 2 -2 2 -a1 -o '1.2,1.1,2.1' ${OUTPUT_PATH}/classifications/${classification}_numeric_2.tsv ${OUTPUT_PATH}/base/all_words_with_count.tsv |
-	awk -F$'\t' 'BEGIN{OFS=FS}{print $1,$2,$3,($2/$3)}' |			# calculate total in group/total documents
-	awk -F$'\t' -v MIN_APPEAR="${MIN_APPEAR}" '{if($2>=MIN_APPEAR)print $0}' |
-	LANG=en_EN sort -t$'\t' -k2,2nr |											# sort by group frequency
-	awk -F$'\t' 'BEGIN{OFS=FS}{print $0,FNR}'|
-	head -n ${FILTER_TOP_X} |										# get only the first X more frequent phrases
-	LANG=en_EN sort -t$'\t' -k4,4nr |											# sort by division over total
-	awk -F$'\t' 'BEGIN{OFS=FS}{print $0,FNR,(($5*0.7+FNR*0.3)*2.5)}'|
-	LANG=en_EN sort -t$'\t' -k7,7n |										# select top Y
-	head -n${SELECT_TOP_Y} > ${OUTPUT_PATH}/classifications/${classification}_final_2.tsv
+	# ${SCRIPT_DIR}/../utils/unix/sjoin -t$'\t' -1 2 -2 2 -a1 -o '1.2,1.1,2.1' ${OUTPUT_PATH}/classifications/${classification}_numeric_2.tsv ${OUTPUT_PATH}/base/all_words_with_count.tsv |
+	# awk -F$'\t' 'BEGIN{OFS=FS}{print $1,$2,$3,($2/$3)}' |			# calculate total in group/total documents
+	# awk -F$'\t' -v MIN_APPEAR="${MIN_APPEAR}" '{if($2>=MIN_APPEAR)print $0}' |
+	# LANG=en_EN sort -t$'\t' -k2,2nr |											# sort by group frequency
+	# awk -F$'\t' 'BEGIN{OFS=FS}{print $0,FNR}'|
+	# head -n ${FILTER_TOP_X} |										# get only the first X more frequent phrases
+	# LANG=en_EN sort -t$'\t' -k4,4nr |											# sort by division over total
+	# awk -F$'\t' 'BEGIN{OFS=FS}{print $0,FNR,(($5*0.7+FNR*0.3)*2.5)}'|
+	# LANG=en_EN sort -t$'\t' -k7,7n |										# select top Y
+	# head -n${SELECT_TOP_Y} > ${OUTPUT_PATH}/classifications/${classification}_final_2.tsv
 
 	cat ${OUTPUT_PATH}/classifications/${classification}_final* |
 	LANG=en_EN sort -t$'\t' -k7,7n |										# select top Y
